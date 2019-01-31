@@ -1,0 +1,11 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/dgraph-io/badger"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/dgraph-io/dgo"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/docopt/docopt-go"
