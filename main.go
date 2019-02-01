@@ -3,12 +3,15 @@ package main;
 import (
   "os"
   "log"
+  "context"
+
+  "github.com/docopt/docopt-go"
 
   "google.golang.org/grpc"
   "github.com/dgraph-io/dgo"
   "github.com/dgraph-io/dgo/protos/api"
 
-  "github.com/docopt/docopt-go"
+  "github.com/dgraph-io/badger"
 )
 
 var usage = `dgraph live cache warmup utility.
@@ -33,6 +36,7 @@ var Config struct {
 };
 
 var Client *dgo.Dgraph;
+var DB *badger.DB;
 
 func main() {
   var conn *grpc.ClientConn;
@@ -43,15 +47,55 @@ func main() {
   Client, conn = connect()
   defer conn.Close()
 
+  DB = open_db()
+  defer DB.Close()
+
   os.MkdirAll(Config.Dir, os.ModePerm);
+
+  query();
 }
 
 func connect() (*dgo.Dgraph, *grpc.ClientConn) {
   conn, err := grpc.Dial(Config.Url, grpc.WithInsecure())
   if err != nil {
+    log.Println("Failed to connect to DGraph")
     log.Fatal(err)
   }
 
   dc := api.NewDgraphClient(conn)
   return dgo.NewDgraphClient(dc), conn
+}
+
+func open_db() (*badger.DB) {
+  opts := badger.DefaultOptions
+  opts.Dir = Config.Dir
+  opts.ValueDir = Config.Dir
+
+  db, err := badger.Open(opts)
+  if err != nil {
+    log.Println("Failed to open badger database")    
+	  log.Fatal(err)
+  }
+  return db
+}
+
+func query() {
+  q := `
+    query {
+      all(func: has(type)) {
+        uid
+      }
+    }
+  `;
+
+  ctx := context.Background()
+
+  txn := Client.NewTxn()
+  defer txn.Discard(ctx)
+
+  resp, err := txn.Query(ctx, q)
+  if (err != nil) {
+    log.Fatal(err)
+  }
+  log.Println(string(resp.Json))
 }

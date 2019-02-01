@@ -3,15 +3,39 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/AndreasBriese/bbloom"
+  packages = ["."]
+  revision = "343706a395b76e5ca5c7dca46a5d937b48febc74"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/dgraph-io/badger"
+  packages = [".","options","pb","skl","table","y"]
+  revision = "5d71fbc20fc5a2e77e7709274d76deeb9fa7fc35"
+
+[[projects]]
+  branch = "master"
   name = "github.com/dgraph-io/dgo"
   packages = [".","protos/api","y"]
   revision = "a97eb8186a3aad431ad42af9d8128945c7d69ceb"
 
 [[projects]]
   branch = "master"
+  name = "github.com/dgryski/go-farm"
+  packages = ["."]
+  revision = "3adb47b1fb0f6d9efcc5051a6c62e2e413ac85a9"
+
+[[projects]]
+  branch = "master"
   name = "github.com/docopt/docopt-go"
   packages = ["."]
   revision = "ee0de3bc6815ee19d4a46c7eb90f829db0e014b1"
+
+[[projects]]
+  name = "github.com/dustin/go-humanize"
+  packages = ["."]
+  revision = "9f541cc9db5d55bce703bd99987c9d5cb8eea45e"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -58,6 +82,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "80fd9540985df894393d4182836d1b3f288ac3064f439e66521d33a75b381102"
+  inputs-digest = "51fde8de2b5e755408224cf95d2fa82e6cd724acc31d924bcd7160249013a8f9"
   solver-name = "gps-cdcl"
   solver-version = 1
