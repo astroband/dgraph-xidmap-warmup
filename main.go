@@ -84,7 +84,7 @@ func open_db() (*badger.DB) {
 func query() {
   q := `
     query {
-      all(func: has(key)) {
+      all(func: has(key)) @cascade {
         uid
         key
       }
