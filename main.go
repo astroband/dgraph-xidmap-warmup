@@ -4,6 +4,8 @@ import (
   "os"
   "log"
   "context"
+  // "encoding/hex"
+  "encoding/json"
 
   "github.com/docopt/docopt-go"
 
@@ -73,7 +75,7 @@ func open_db() (*badger.DB) {
 
   db, err := badger.Open(opts)
   if err != nil {
-    log.Println("Failed to open badger database")    
+    log.Println("Failed to open badger database")
 	  log.Fatal(err)
   }
   return db
@@ -82,8 +84,9 @@ func open_db() (*badger.DB) {
 func query() {
   q := `
     query {
-      all(func: has(type)) {
+      all(func: has(key)) {
         uid
+        key
       }
     }
   `;
@@ -97,5 +100,18 @@ func query() {
   if (err != nil) {
     log.Fatal(err)
   }
-  log.Println(string(resp.Json))
+
+  var data map[string]interface{}
+
+  err = json.Unmarshal(resp.Json, &data)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  //log.Println(data["all"])
+
+  for _, item := range data["all"].([]interface{}) {
+    x := item.(map[string]interface{})
+    log.Println(x["key"], x["uid"])
+  }
 }
