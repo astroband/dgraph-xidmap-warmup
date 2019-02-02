@@ -21,10 +21,10 @@ import (
 var usage = `dgraph live cache warmup utility.
 
 Usage:
-  dgraph-xidmap-warmup PREDICATE... --dir <dir> --url <url>
+  dgraph-xidmap-warmup PREDICATE --dir <dir> --url <url>
 
 Arguments:
-  PREDICATE predicate(s) holding hash keys
+  PREDICATE predicate holding hash keys
 
 Options:
   -h --help        Show this screen.
@@ -33,8 +33,9 @@ Options:
   --url <url>      DGraph url to connect.
 `;
 
+// TODO: multiple predicates for low/high
 var Config struct {
-  Predicate []string
+  Predicate string
   Dir string
   Url string
 };
@@ -44,6 +45,8 @@ var DB *badger.DB;
 
 func main() {
   var conn *grpc.ClientConn;
+
+  log.SetPrefix("xidmap ")
 
   config, _ := docopt.ParseArgs(usage, nil, "1.0")
   config.Bind(&Config)
@@ -85,11 +88,13 @@ func open_db() (*badger.DB) {
 }
 
 func query() ([]interface{}) {
+  log.Println("Quering DGraph...")
+
   q := `
     query {
-      all(func: has(key)) @cascade {
+      all(func: has(` + Config.Predicate + `)) @cascade {
         uid
-        key
+        ` + Config.Predicate + `
       }
     }
   `;
@@ -115,6 +120,8 @@ func query() ([]interface{}) {
 }
 
 func store(r []interface{}) {
+  log.Printf("Storing %d records...", len(r))
+
   for _, item := range r {
     i := item.(map[string]interface{})
 
@@ -130,7 +137,7 @@ func store(r []interface{}) {
       buf := make([]byte, binary.MaxVarintLen64)
       n := binary.PutUvarint(buf, uid)
 
-      err = txn.Set([]byte(i["key"].(string)), buf[:n])
+      err = txn.Set([]byte(i[Config.Predicate].(string)), buf[:n])
       return err;
     })
 
