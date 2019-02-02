@@ -4,7 +4,6 @@ import (
   "os"
   "log"
   "context"
-  // "encoding/hex"
   "encoding/json"
 
   "github.com/docopt/docopt-go"
@@ -14,6 +13,8 @@ import (
   "github.com/dgraph-io/dgo/protos/api"
 
   "github.com/dgraph-io/badger"
+
+  "github.com/bitherhq/go-bither/common/hexutil"
 )
 
 var usage = `dgraph live cache warmup utility.
@@ -54,7 +55,8 @@ func main() {
 
   os.MkdirAll(Config.Dir, os.ModePerm);
 
-  query();
+  result := query()
+  store(result)
 }
 
 func connect() (*dgo.Dgraph, *grpc.ClientConn) {
@@ -81,7 +83,7 @@ func open_db() (*badger.DB) {
   return db
 }
 
-func query() {
+func query() ([]interface{}) {
   q := `
     query {
       all(func: has(key)) @cascade {
@@ -108,10 +110,27 @@ func query() {
     log.Fatal(err)
   }
 
-  //log.Println(data["all"])
+  return data["all"].([]interface{});
+}
 
-  for _, item := range data["all"].([]interface{}) {
-    x := item.(map[string]interface{})
-    log.Println(x["key"], x["uid"])
+func store(r []interface{}) {
+  for _, item := range r {
+    i := item.(map[string]interface{})
+
+    err := DB.Update(func(txn *badger.Txn) error {
+      s := i["uid"].(string)
+
+      uid, err := hexutil.Decode(s)
+      if (err != nil) {
+        return err;
+      }
+
+      err = txn.Set([]byte(i["key"].(string)), uid)
+      return err;
+    })
+
+    if (err != nil) {
+      log.Fatal(err)
+    }
   }
 }
