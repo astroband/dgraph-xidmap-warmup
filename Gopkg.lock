@@ -8,6 +8,12 @@
   revision = "343706a395b76e5ca5c7dca46a5d937b48febc74"
 
 [[projects]]
+  name = "github.com/bitherhq/go-bither"
+  packages = ["common/hexutil"]
+  revision = "05101641455a754936acc5ddff92f35f5e33181c"
+  version = "v1.7.1"
+
+[[projects]]
   branch = "master"
   name = "github.com/dgraph-io/badger"
   packages = [".","options","pb","skl","table","y"]
@@ -82,6 +88,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "51fde8de2b5e755408224cf95d2fa82e6cd724acc31d924bcd7160249013a8f9"
+  inputs-digest = "a69c22521cf95f7b473dbd4c19f211128c65484a503f534a1e497e11d812bb08"
   solver-name = "gps-cdcl"
   solver-version = 1

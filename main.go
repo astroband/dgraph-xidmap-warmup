@@ -5,6 +5,7 @@ import (
   "log"
   "context"
   "encoding/json"
+  "encoding/binary"
 
   "github.com/docopt/docopt-go"
 
@@ -117,15 +118,19 @@ func store(r []interface{}) {
   for _, item := range r {
     i := item.(map[string]interface{})
 
+
     err := DB.Update(func(txn *badger.Txn) error {
       s := i["uid"].(string)
 
-      uid, err := hexutil.Decode(s)
+      uid, err := hexutil.DecodeUint64(s)
       if (err != nil) {
         return err;
       }
 
-      err = txn.Set([]byte(i["key"].(string)), uid)
+      buf := make([]byte, binary.MaxVarintLen64)
+      n := binary.PutUvarint(buf, uid)
+
+      err = txn.Set([]byte(i["key"].(string)), buf[:n])
       return err;
     })
 

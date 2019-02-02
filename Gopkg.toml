@@ -11,5 +11,5 @@
   name = "github.com/docopt/docopt-go"
 
 [[constraint]]
-  branch = "master"
+  version = "1.7.1"
   name = "github.com/bitherhq/go-bither"
